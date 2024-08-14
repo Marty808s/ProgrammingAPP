@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import HomePage from './HomePage';
-import PlayGround from './PlayGround';
+import HomePage from './home_page/HomePage';
 import '../../static/css/output.css';
 
 class App extends Component {

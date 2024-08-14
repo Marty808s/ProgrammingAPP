@@ -9,7 +9,7 @@ function CodeEditor() {
     const [code, setCode] = useState("print('Hello, World!')");
     const [output, setOutput] = useState("");
     const [level, setLevel] = useState(null);
-    const [levelId, setLevelId] = useState('0'); // zatím defaultně level 1
+    const [levelId, setLevelId] = useState('0'); // zatím defaultně level 0
 
     // GET na level result podle level_id
     // zatím defaultně level 0 - úvodní úroveň, pak změnit podle level_id param přes URL

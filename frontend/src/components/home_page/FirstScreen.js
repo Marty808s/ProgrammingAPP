@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../../static/css/output.css';
+import Nav from './Nav';
+import Footer from './Footer';
+import '../../../static/css/output.css';
 
 function FirstScreen() {
     const navigate = useNavigate();
@@ -10,10 +12,12 @@ function FirstScreen() {
     };
 
     return (
+        <>
+        <Nav/>
         <div className="flex items-center justify-center h-screen">
             <div className="grid grid-cols-1 gap-4 justify-center text-center">
                 <div>
-                    <h1 className="text-4xl font-bold text-blue-400">Jdeme se naučit programovat v Pythonu!</h1>
+                    <h1 className="text-4xl justify-center font-bold text-blue-400">Jdeme se naučit programovat v Pythonu!</h1>
                 </div>
                 <div className="flex justify-center">
                     <button 
@@ -25,6 +29,8 @@ function FirstScreen() {
                 </div>
             </div>
         </div>
+        <Footer/>
+        </>
     );
 }
 

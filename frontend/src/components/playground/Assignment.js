@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../static/css/output.css';
+import '../../../static/css/output.css';
 
 function Assignment({ nazev, text }){
     return(
