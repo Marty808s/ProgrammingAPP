@@ -24,8 +24,11 @@ function Nav() {
                 <ul className="hidden md:flex space-x-5">
                     <li><a href="#" className="text-white hover:text-gray-300">Home</a></li>
                     <li><a href="#" className="text-white hover:text-gray-300">About</a></li>
-                    <li><a href="#" className="text-white hover:text-gray-300">Services</a></li>
-                    <li><a href="#" className="text-white hover:text-gray-300">Contact</a></li>
+                    <li><a href="login" className="block text-white hover:text-gray-3000">Login</a></li>
+                    { localStorage.getItem('isLoggedIn') === 'true' && (
+                        <li><a href="logout" className="block text-white hover:text-gray-300">{localStorage.getItem('username')}</a></li>
+                    )}
+
                 </ul>
             </div>
 
@@ -34,8 +37,10 @@ function Nav() {
                 <ul className="md:hidden mt-4 space-y-2">
                     <li><a href="#" className="block text-white hover:text-gray-300">Home</a></li>
                     <li><a href="#" className="block text-white hover:text-gray-300">About</a></li>
-                    <li><a href="#" className="block text-white hover:text-gray-300">Services</a></li>
-                    <li><a href="#" className="block text-white hover:text-gray-300">Contact</a></li>
+                    <li><a href="login" className="block text-white hover:text-gray-300">Login</a></li>
+                    { localStorage.getItem('isLoggedIn') === 'true' && (
+                        <li><a href="logout" className="block text-white hover:text-gray-300">{localStorage.getItem('username')}</a></li>
+                    )}
                 </ul>
             )}
         </nav>

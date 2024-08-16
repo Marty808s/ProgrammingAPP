@@ -1,11 +1,19 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from .models import User, Code, Level
-from .serializers import UserSerializer, CodeSerializer, LevelSerializer
+from .serializers import UserSerializer, CodeSerializer, LevelSerializer, LoginSerializer, RegisterSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .codeValidator import test_code
+from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth import logout
 
+
+class InitializeSession(APIView):
+    def get(self, request):
+        if not request.session.session_key:
+            request.session.create()
+        return Response({"session_key": request.session.session_key}, status=status.HTTP_200_OK)
 
 #API uživatelů - POST A GET
 # -> asi potom předělat na GET a POST přes APIView
@@ -81,3 +89,56 @@ class AllCodes(APIView):
 
 
 
+class Login(APIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            name = serializer.validated_data['name']
+            password = serializer.validated_data['password']
+            
+            try:
+                user = User.objects.get(name=name)
+            except User.DoesNotExist:
+                return Response({"message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            if check_password(password, user.password):
+                request.session['user_id'] = user.id
+                return Response({"message": "Login successful", "user_id": user.id}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Register(APIView):
+    serializer_class = RegisterSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            try:
+                user = User(
+                    name=serializer.validated_data['name'],
+                    email=serializer.validated_data.get('email')  # Předpokládáme, že email je v serializeru
+                )
+                user.password = make_password(serializer.validated_data['password'])
+                user.save()
+                return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+#UDĚLAT VIEW PRO PŘEDÁNÍ INFORMACÍ O UŽIVATELI
+
+class UserInfo(APIView):
+    def get(self, request):
+        user_id = request.session.get('user_id')
+        user = User.objects.get(id=user_id)
+        return Response({"user_id": user_id, "name": user.name, "email": user.email}, status=status.HTTP_200_OK)
+    
+class Logout(APIView):
+    def post(self, request):
+        logout(request)
+        return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PlayGround from '../playground/PlayGround';
 import FirstScreen from './FirstScreen';
-import Nav from './Nav';
+import Login from './Login';
+import Logout from './Logout';
 import '../../../static/css/output.css'
 import { 
     BrowserRouter as Router, 
@@ -20,6 +21,8 @@ class HomePage extends Component {
                 <Routes>
                     <Route path="/" element={<FirstScreen/>} />
                     <Route path="/playground" element={<PlayGround />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/logout" element={<Logout />} />
                 </Routes>
             </Router>   
         )

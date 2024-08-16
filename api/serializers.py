@@ -21,3 +21,27 @@ class LevelSerializer(serializers.ModelSerializer):
         fields = ['level_id', 'result']
 
 
+class LoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['name', 'password']
+        
+
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['name', 'email', 'password']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    # kontrola, zda uživatel s tímto jménem nebo emailem neexistuje
+    # => metody se volají při validaci dat
+    def validate_name(self, value):
+        if User.objects.filter(name=value).exists():
+            raise serializers.ValidationError("A user with this name already exists.")
+        return value
+
+    # kontrola, zda uživatel s tímto emailem neexistuje
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+        return value
