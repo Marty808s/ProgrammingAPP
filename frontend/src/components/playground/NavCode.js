@@ -1,0 +1,47 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+function NavCode() {
+    const navigate = useNavigate();
+    const [levels, setLevels] = useState([]);
+
+    useEffect(() => {
+        fetchLevels();
+    }, []);
+
+    const fetchLevels = async () => {
+        const response = await fetch('/api/levelall');
+        const data = await response.json();
+        setLevels(data);
+        console.log(data);
+    };
+
+    const handleLevelClick = (level_id) => {
+        navigate(`/playground?level_id=${level_id}`);
+    };
+
+    return (
+        <div className='flex mx-auto flex-col items-center justify-center bg-gray-600'>
+            { localStorage.getItem('username') ?
+            <div className='w-full text-left mb-4 px-4'> 
+                <h1 className='text-white'>{localStorage.getItem('username')}</h1>
+            </div>:
+            <div className='w-full text-ceter mb-4 px-4'>
+                <button className='text-white p-2 rounded-md' onClick={() => navigate('/login')}>Přihlaste se!</button>
+            </div>}
+            <div className='flex flex-col items-center gap-4 justify-center p-4 bg-gray-600'>
+                {levels.map((level) => (
+                    <button 
+                    onClick={() => handleLevelClick(level.level_id)} 
+                    key={level.level_id} 
+                    className='p-4 bg-gray-700 rounded hover:bg-gray-600 transition-colors duration-200'
+                    >
+                        <h2 className='text-white'>{level.level_id}</h2>
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+export default NavCode;

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import { useEffect } from 'react';
 import 'codemirror/lib/codemirror.css';
@@ -6,18 +7,27 @@ import 'codemirror/theme/material.css';
 import 'codemirror/mode/python/python';
 
 function CodeEditor() {
+    const navigate = useNavigate();
+    const username = localStorage.getItem('username');
     const [code, setCode] = useState("print('Hello, World!')");
     const [output, setOutput] = useState("");
     const [level, setLevel] = useState(null);
-    const [levelId, setLevelId] = useState('0'); // zatím defaultně level 0
-
+    const [levelId, setLevelId] = useState('0'); // zatím defaultně level 0 - dodělat přes requesty
+    const [userInfo, setUserInfo] = useState(null);
     // GET na level result podle level_id
     // zatím defaultně level 0 - úvodní úroveň, pak změnit podle level_id param přes URL
     // POKUD už vlastně zjistím level_id z URL, tak nemusím přes get dostat result a porovnat ho přes get code,
     //  ale můžu přes get code dostat result a porovnat ho přes level_id, který bude v post jsonu - pak to bude jednodušší a vrátím boolean T/F
 
     useEffect(() => {
+        if (!username) {
+            navigate('/login');
+        }
+    }, [navigate, username]);
+
+    useEffect(() => {
         fetchLevel();
+        fetchUserInfo();
     }, [levelId]);
 
     const fetchLevel = async () => {
@@ -34,6 +44,21 @@ function CodeEditor() {
         }
     };
 
+    const fetchUserInfo = async () => {
+        try {
+            const response = await fetch(`/api/userinfo?username=${username}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            setUserInfo(data);
+            console.log(data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+
     // handleSubmit na submit buttonu pro odeslání kódu a získání outputu
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -47,7 +72,7 @@ function CodeEditor() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ 
-                    id_user: 'WjDY8l5hcPIQkG11RWsxUhGhiKNAs6lO',
+                    id_user: userInfo.user_id,
                     code: code,
                     level: level.level_id
                 }),

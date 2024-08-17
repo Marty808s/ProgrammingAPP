@@ -34,7 +34,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     # kontrola, zda uživatel s tímto jménem nebo emailem neexistuje
-    # => metody se volají při validaci dat
     def validate_name(self, value):
         if User.objects.filter(name=value).exists():
             raise serializers.ValidationError("A user with this name already exists.")

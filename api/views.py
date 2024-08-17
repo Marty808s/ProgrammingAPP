@@ -88,6 +88,16 @@ class AllCodes(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class LevelALL(APIView):
+    def get(self, request):
+        queryset = Level.objects.all()
+        serializer = LevelSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ClearLevels(APIView):
+    def post(self, request):
+        Level.objects.all().delete()
+        return Response({"message": "All levels have been deleted"}, status=status.HTTP_200_OK)
 
 class Login(APIView):
     serializer_class = LoginSerializer
@@ -132,11 +142,15 @@ class Register(APIView):
         
 #UDĚLAT VIEW PRO PŘEDÁNÍ INFORMACÍ O UŽIVATELI
 
-class UserInfo(APIView):
+class UserInfo(APIView): #přijímá name ze session a vrací id, name a email
+
     def get(self, request):
-        user_id = request.session.get('user_id')
-        user = User.objects.get(id=user_id)
-        return Response({"user_id": user_id, "name": user.name, "email": user.email}, status=status.HTTP_200_OK)
+        user_name = request.query_params.get('username')
+        user = User.objects.get(name=user_name)
+        if user:
+            return Response({"user_id": user.id, "name": user.name, "email": user.email}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     
 class Logout(APIView):
     def post(self, request):
