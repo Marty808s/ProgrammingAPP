@@ -17,7 +17,7 @@ function NavCode() {
     };
 
     const handleLevelClick = (level_id) => {
-        navigate(`/playground?level_id=${level_id}`);
+        window.location.href = `/playground?level_id=${level_id}`;
     };
 
     return (
@@ -34,9 +34,13 @@ function NavCode() {
                     <button 
                     onClick={() => handleLevelClick(level.level_id)} 
                     key={level.level_id} 
-                    className='p-4 bg-gray-700 rounded hover:bg-gray-600 transition-colors duration-200'
+                    className={
+                        level.level_id.toString() === localStorage.getItem('currentLevel')
+                            ? 'p-4 bg-blue-500 text-white rounded hover:bg-gray-600 transition-colors duration-200'
+                            : 'p-4 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors duration-200'
+                    }
                     >
-                        <h2 className='text-white'>{level.level_id}</h2>
+                        {level.level_id}
                     </button>
                 ))}
             </div>

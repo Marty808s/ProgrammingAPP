@@ -1,49 +1,62 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Controlled as CodeMirror } from 'react-codemirror2';
-import { useEffect } from 'react';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
 import 'codemirror/mode/python/python';
 
 function CodeEditor() {
-    const navigate = useNavigate();
-    const username = localStorage.getItem('username');
-    const [code, setCode] = useState("print('Hello, World!')");
-    const [output, setOutput] = useState("");
-    const [level, setLevel] = useState(null);
-    const [levelId, setLevelId] = useState('0'); // zatím defaultně level 0 - dodělat přes requesty
-    const [userInfo, setUserInfo] = useState(null);
-    // GET na level result podle level_id
-    // zatím defaultně level 0 - úvodní úroveň, pak změnit podle level_id param přes URL
-    // POKUD už vlastně zjistím level_id z URL, tak nemusím přes get dostat result a porovnat ho přes get code,
-    //  ale můžu přes get code dostat result a porovnat ho přes level_id, který bude v post jsonu - pak to bude jednodušší a vrátím boolean T/F
+    const navigate = useNavigate(); // pro redirekt
+    const location = useLocation(); // pro hledání paramů v URL
+    const username = localStorage.getItem('username'); // jméno uživatele z localStorage
+    const [code, setCode] = useState("print('Hello, World!')"); // kód pro odeslání
+    const [output, setOutput] = useState(""); // výstup kódu
+    const [levels, setLevels] = useState([]); // všechny úrovně
+    const [currentLevel, setCurrentLevel] = useState(null); // aktuální level podle param v URL
+    const [userInfo, setUserInfo] = useState(null); // info o uživateli
 
+    // načtení úrovní a info o uživateli
     useEffect(() => {
         if (!username) {
-            navigate('/login');
+            navigate('/login'); // nejsi přihlášen => zmiz
+        } else {
+            const searchParams = new URLSearchParams(location.search); // hledání paramů v URL
+            const levelIdFromParams = searchParams.get('level_id'); // získání level_id z URL
+            localStorage.setItem('currentLevel', levelIdFromParams); // uložím level_id do localStorage
+
+            if (levelIdFromParams) {
+                fetchLevels(levelIdFromParams); // načtení úrovní podle level_id z URL + aktuální
+            } else {
+                console.error('Nemám level_id v URL');
+            }
+            fetchUserInfo(); // načtení info o uživateli
         }
-    }, [navigate, username]);
+    }, [navigate, username, location.search]);
 
-    useEffect(() => {
-        fetchLevel();
-        fetchUserInfo();
-    }, [levelId]);
-
-    const fetchLevel = async () => {
+    // fetchnui všechny levels
+    const fetchLevels = async (id) => {
         try {
-            const response = await fetch(`/api/level?level_id=${levelId}`);
+            const response = await fetch(`/api/levelall`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
-            setLevel(data);
-            console.log(data);
+            setLevels(data); //uložím všechny úrovně
+            const selectedLevel = data.find(level => level.level_id.toString() === id); // vyberu aktuální level
+            if (selectedLevel) {
+                setCurrentLevel(selectedLevel); //nastavím aktuální úroveň
+                console.log(selectedLevel);
+                setCode(selectedLevel.initial_code || "print('Hello, World!')"); // default code
+            } else {
+                console.error('Nemám aktuální level');
+            }
+            console.log('Levels:', data);
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error levels:', error);
         }
     };
 
+    // fetchnu info o uživateli
     const fetchUserInfo = async () => {
         try {
             const response = await fetch(`/api/userinfo?username=${username}`);
@@ -51,7 +64,7 @@ function CodeEditor() {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
-            setUserInfo(data);
+            setUserInfo(data); //uložím info o uživateli
             console.log(data);
         } catch (error) {
             console.error('Error:', error);
@@ -60,6 +73,7 @@ function CodeEditor() {
 
 
     // handleSubmit na submit buttonu pro odeslání kódu a získání outputu
+    // - poslu kod na server - ziskám output - validace outputu s levelem
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Submitted code:", code);
@@ -74,7 +88,7 @@ function CodeEditor() {
                 body: JSON.stringify({ 
                     id_user: userInfo.user_id,
                     code: code,
-                    level: level.level_id
+                    level: currentLevel.level_id
                 }),
             });
             
@@ -86,10 +100,11 @@ function CodeEditor() {
             const result = await response.json();
             setOutput(result.code_output || 'No output received');
 
-            if (result.code_output === level.result) {
-                console.log(`Super, máš to správně!: ${level.level_id}`);
+            // validace outputu s levelem
+            if (result.code_output === currentLevel.result) {
+                console.log(`Super, máš to správně!: ${currentLevel.level_id}`);
             } else {
-                console.log(`Špatně, zkus to znovu!: ${level.level_id}`);
+                console.log(`Špatně, zkus to znovu!: ${currentLevel.level_id}`);
             }
         } catch (error) {
             console.error('Error:', error);
@@ -98,6 +113,7 @@ function CodeEditor() {
     };
 
     return (
+    // formulář pro odeslání kódu - CodeMirror pro editaci kódu, textarea pro výstup a button pro odeslání kódu
     <div className="fixed bottom-0 left-0 right-0 items-center justify-center mx-auto py-2 px-4">
         <form id="pythonForm" className="space-y-4" onSubmit={handleSubmit}>
             <div>

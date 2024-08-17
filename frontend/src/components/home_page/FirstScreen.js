@@ -8,7 +8,7 @@ function FirstScreen() {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate('/playground');
+        navigate('/playground?level_id=0'); // asi udělat inteligentněji? možná začít na last splněném?
     };
 
     return (
