@@ -18,7 +18,7 @@ class CodeSerializer(serializers.ModelSerializer):
 class LevelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Level
-        fields = ['level_id', 'result']
+        fields = ['level_id', 'level_name', 'level_description', 'level_code', 'result']
 
 
 class LoginSerializer(serializers.ModelSerializer):

@@ -57,9 +57,15 @@ class LevelView(APIView):
         if serializer.is_valid():
             level, created = Level.objects.get_or_create(
                 level_id=serializer.validated_data['level_id'],
+                level_name=serializer.validated_data['level_name'],
+                level_description=serializer.validated_data['level_description'],
+                level_code=serializer.validated_data['level_code'],
                 defaults={'result': serializer.validated_data['result']}
             )
             if not created: # pokud level s id existuje, tak ho aktualizuju
+                level.level_name = serializer.validated_data['level_name']
+                level.level_description = serializer.validated_data['level_description']
+                level.level_code = serializer.validated_data['level_code']
                 level.result = serializer.validated_data['result']
                 level.save()
 

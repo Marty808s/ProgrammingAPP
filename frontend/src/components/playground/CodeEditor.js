@@ -4,6 +4,7 @@ import { Controlled as CodeMirror } from 'react-codemirror2';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
 import 'codemirror/mode/python/python';
+import Assignment from './Assignment';
 
 function CodeEditor() {
     const navigate = useNavigate(); // pro redirekt
@@ -113,7 +114,12 @@ function CodeEditor() {
     };
 
     return (
-    // formulář pro odeslání kódu - CodeMirror pro editaci kódu, textarea pro výstup a button pro odeslání kódu
+    <>
+        <Assignment 
+        level_name={currentLevel?.level_name} 
+        level_description={currentLevel?.level_description} 
+        level_code={currentLevel?.level_code} />
+
     <div className="fixed bottom-0 left-0 right-0 items-center justify-center mx-auto py-2 px-4">
         <form id="pythonForm" className="space-y-4" onSubmit={handleSubmit}>
             <div>
@@ -140,6 +146,7 @@ function CodeEditor() {
             <button type="submit" className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-700">Run Code</button>
         </form>
     </div>
+    </>
     )
 }
 
