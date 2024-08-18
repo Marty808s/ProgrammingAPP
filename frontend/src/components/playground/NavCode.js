@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
+//TO:DO:
+// - přidat progress bar - zelena, pokud je progress 1
 function NavCode() {
     const navigate = useNavigate();
     const [levels, setLevels] = useState([]);

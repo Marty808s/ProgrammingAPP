@@ -138,7 +138,7 @@ function CodeEditor() {
 
             } else {
                 console.log(`Špatně, zkus to znovu!: ${currentLevel.level_id}`);
-                sendProgress(false);
+                sendProgress(false)
             }
         } catch (error) {
             console.error('Error:', error);

@@ -177,7 +177,7 @@ class LevelProgressView(APIView):
             level_progress, created = LevelProgress.objects.get_or_create(
                 id_user=id_user,
                 level_id=level_id,
-                progress=new_progress
+                defaults={'progress': new_progress}
             )
 
             if not created:
@@ -186,6 +186,8 @@ class LevelProgressView(APIView):
                     level_progress.progress = new_progress
                     level_progress.save()
                     return Response({"message": "Progress updated"}, status=status.HTTP_200_OK)
+                elif level_progress.progress == 0 and new_progress == 0:
+                    return Response({"message": "Progress remains 0"}, status=status.HTTP_200_OK)
                 else:
                     return Response({"message": "Existing progress is better or equal"}, status=status.HTTP_200_OK)
 
@@ -206,3 +208,4 @@ class LevelProgressView(APIView):
         
         serializer = LevelProgressSerializer(progress_entries, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
