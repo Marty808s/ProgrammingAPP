@@ -33,6 +33,7 @@
     "codemirror": "^5.65.17",
     "postcss": "^8.4.41",
     "react-codemirror2": "^8.0.0",
+    "react-modal": "^3.16.1",
     "react-router-dom": "^6.26.0"
   }
 }

@@ -5,6 +5,8 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
 import 'codemirror/mode/python/python';
 import Assignment from './Assignment';
+import CoderBox from './CoderBox';
+import Modal from 'react-modal';
 
 function CodeEditor() {
     const navigate = useNavigate(); // pro redirekt
@@ -15,6 +17,7 @@ function CodeEditor() {
     const [levels, setLevels] = useState([]); // všechny úrovně
     const [currentLevel, setCurrentLevel] = useState(null); // aktuální level podle param v URL
     const [userInfo, setUserInfo] = useState(null); // info o uživateli
+    const [isModalOpen, setIsModalOpen] = useState(false); // zda je modal otevřený
 
     // načtení úrovní a info o uživateli
     useEffect(() => {
@@ -104,6 +107,7 @@ function CodeEditor() {
             // validace outputu s levelem
             if (result.code_output === currentLevel.result) {
                 console.log(`Super, máš to správně!: ${currentLevel.level_id}`);
+                setIsModalOpen(true); // otevřu modal
             } else {
                 console.log(`Špatně, zkus to znovu!: ${currentLevel.level_id}`);
             }
@@ -116,9 +120,10 @@ function CodeEditor() {
     return (
     <>
         <Assignment 
-        level_name={currentLevel?.level_name} 
-        level_description={currentLevel?.level_description} 
-        level_code={currentLevel?.level_code} />
+            level_name={currentLevel?.level_name} 
+            level_description={currentLevel?.level_description} 
+            level_code={currentLevel?.level_code} 
+        />
 
     <div className="fixed bottom-0 left-0 right-0 items-center justify-center mx-auto py-2 px-4">
         <form id="pythonForm" className="space-y-4" onSubmit={handleSubmit}>
@@ -146,6 +151,11 @@ function CodeEditor() {
             <button type="submit" className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-700">Run Code</button>
         </form>
     </div>
+    <CoderBox 
+        isOpen={isModalOpen} 
+        onRequestClose={() => setIsModalOpen(false)} 
+        contentLabel="Gratulace" level={currentLevel} 
+    />
     </>
     )
 }
