@@ -42,12 +42,16 @@ class Code(models.Model):
 
 
 class Level(models.Model):
-    level_id = models.IntegerField(default=0)
+    level_id = models.IntegerField(default=0, primary_key=True)
     level_name = models.CharField(max_length=200, default="")
     level_description = models.CharField(max_length=200, default="")
     level_code = models.CharField(max_length=200, null=True)
     result = models.CharField(max_length=200)
 
+class LevelProgress(models.Model):
+    id_user = models.ForeignKey(User, on_delete=models.CASCADE, to_field='id')
+    level_id = models.ForeignKey(Level, on_delete=models.CASCADE, to_field='level_id')
+    progress = models.IntegerField(default=0)
 
 
 

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics, status
-from .models import User, Code, Level
-from .serializers import UserSerializer, CodeSerializer, LevelSerializer, LoginSerializer, RegisterSerializer
+from .models import User, Code, Level, LevelProgress
+from .serializers import UserSerializer, CodeSerializer, LevelSerializer, LoginSerializer, RegisterSerializer, LevelProgressSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .codeValidator import test_code
@@ -162,3 +162,47 @@ class Logout(APIView):
     def post(self, request):
         logout(request)
         return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
+
+
+class LevelProgressView(APIView):
+    serializer_class = LevelProgressSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            id_user = serializer.validated_data['id_user']
+            level_id = serializer.validated_data['level_id']
+            new_progress = serializer.validated_data['progress']
+
+            level_progress, created = LevelProgress.objects.get_or_create(
+                id_user=id_user,
+                level_id=level_id,
+                progress=new_progress
+            )
+
+            if not created:
+                # Update progress only if the new progress is better
+                if new_progress > level_progress.progress:
+                    level_progress.progress = new_progress
+                    level_progress.save()
+                    return Response({"message": "Progress updated"}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"message": "Existing progress is better or equal"}, status=status.HTTP_200_OK)
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self, request):
+        id_user = request.query_params.get('id_user')
+        level_id = request.query_params.get('level_id')
+        
+        if not id_user or not level_id:
+            return Response({"error": "Both id_user and level_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        progress_entries = LevelProgress.objects.filter(id_user=id_user, level_id=level_id)
+        
+        if not progress_entries.exists():
+            return Response({"error": "Progress not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = LevelProgressSerializer(progress_entries, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

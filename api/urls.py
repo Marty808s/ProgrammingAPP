@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import UserList, CodeView, LevelView, AllCodes, Login, Register, InitializeSession, Logout, LevelALL, ClearLevels, UserInfo
+from .views import UserList, CodeView, LevelView, AllCodes, Login, Register, InitializeSession, Logout, LevelALL, ClearLevels, UserInfo, LevelProgressView
 
 urlpatterns = [
     path('users', UserList.as_view()),
@@ -12,5 +12,6 @@ urlpatterns = [
     path('logout', Logout.as_view()),
     path('levelall', LevelALL.as_view()), #jen pro testy
     path('clearlevels', ClearLevels.as_view()), #jen pro testy
-    path('userinfo', UserInfo.as_view())
+    path('userinfo', UserInfo.as_view()),
+    path('progress', LevelProgressView.as_view())
 ]

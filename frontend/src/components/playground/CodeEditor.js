@@ -75,6 +75,30 @@ function CodeEditor() {
         }
     };
 
+    // zaznamenám sprábnou odpověď
+    const sendProgress = async (status) => {
+        try {
+            const response = await fetch('/api/progress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id_user: userInfo.user_id,
+                    level_id: currentLevel.level_id,
+                    progress: status ? 1 : 0
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
 
     // handleSubmit na submit buttonu pro odeslání kódu a získání outputu
     // - poslu kod na server - ziskám output - validace outputu s levelem
@@ -108,8 +132,13 @@ function CodeEditor() {
             if (result.code_output === currentLevel.result) {
                 console.log(`Super, máš to správně!: ${currentLevel.level_id}`);
                 setIsModalOpen(true); // otevřu modal
+
+                //změna progressu
+                sendProgress(true);
+
             } else {
                 console.log(`Špatně, zkus to znovu!: ${currentLevel.level_id}`);
+                sendProgress(false);
             }
         } catch (error) {
             console.error('Error:', error);

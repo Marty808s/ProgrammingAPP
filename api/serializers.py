@@ -2,7 +2,7 @@
 # -slouží pro API
 
 from rest_framework import serializers
-from .models import User, Code, Level
+from .models import User, Code, Level, LevelProgress
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,3 +44,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("A user with this email already exists.")
         return value
+
+class LevelProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LevelProgress
+        fields = ['id_user', 'level_id', 'progress']
