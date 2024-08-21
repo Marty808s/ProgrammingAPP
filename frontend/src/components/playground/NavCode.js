@@ -68,7 +68,6 @@ function NavCode() {
                     } else if (isCurrentLevel) {
                         buttonClass += 'bg-blue-500 hover:bg-blue-600 border-white';
                     } else if (isCompleted) {
-                        console.log("Jsem completed!");
                         buttonClass += 'bg-green-500 hover:bg-green-700';
                     } else {
                         buttonClass += 'bg-gray-500 hover:bg-gray-700';
