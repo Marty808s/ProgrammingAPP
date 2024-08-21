@@ -198,10 +198,13 @@ class LevelProgressView(APIView):
         id_user = request.query_params.get('id_user')
         level_id = request.query_params.get('level_id')
         
-        if not id_user or not level_id:
-            return Response({"error": "Both id_user and level_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not id_user:
+            return Response({"error": "id_user is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        progress_entries = LevelProgress.objects.filter(id_user=id_user, level_id=level_id)
+        if level_id:
+            progress_entries = LevelProgress.objects.filter(id_user=id_user, level_id=level_id)
+        else:
+            progress_entries = LevelProgress.objects.filter(id_user=id_user)
         
         if not progress_entries.exists():
             return Response({"error": "Progress not found"}, status=status.HTTP_404_NOT_FOUND)

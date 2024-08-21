@@ -12,6 +12,7 @@ function CodeEditor() {
     const navigate = useNavigate(); // pro redirekt
     const location = useLocation(); // pro hledání paramů v URL
     const username = localStorage.getItem('username'); // jméno uživatele z localStorage
+            
     const [code, setCode] = useState("print('Hello, World!')"); // kód pro odeslání
     const [output, setOutput] = useState(""); // výstup kódu
     const [levels, setLevels] = useState([]); // všechny úrovně

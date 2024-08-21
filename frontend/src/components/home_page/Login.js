@@ -42,6 +42,7 @@ function Login() {
                 console.log('Login successful:', response.data)
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('username', loginData.name);
+                localStorage.setItem('id_user', response.data.user_id);
                 navigate('/');
             } else {
                 console.log('Login failed:', response.data)
